@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Photo Sharing - Real Time</title>
+    <title>Live File & Foto Sharing</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,63 +14,151 @@
         }
         
         body {
-            background-color: #f5f7fa;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             color: #333;
-            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
         }
         
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
             color: white;
-            padding: 25px 0;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
+            padding: 25px;
+            text-align: center;
         }
         
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .logo i {
+        h1 {
             font-size: 2.5rem;
+            margin-bottom: 10px;
         }
         
-        .logo h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
         }
         
-        .connection-status {
+        .content {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 10px 20px;
-            border-radius: 50px;
+            flex-wrap: wrap;
+            min-height: 70vh;
         }
         
-        .status-dot {
+        .upload-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-right: 2px dashed #ddd;
+        }
+        
+        .viewer-section {
+            flex: 1.5;
+            min-width: 300px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            color: #4a00e0;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .upload-area {
+            border: 3px dashed #8e2de2;
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            background-color: #f0f2ff;
+            margin-bottom: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            background-color: #e8ebff;
+            transform: translateY(-5px);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            color: #8e2de2;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .file-info {
+            display: none;
+            background-color: #e8f4ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .file-info.show {
+            display: block;
+        }
+        
+        .file-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .file-size {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(142, 45, 226, 0.3);
+        }
+        
+        .upload-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .live-indicator {
+            display: inline-block;
             width: 12px;
             height: 12px;
+            background-color: #ff4757;
             border-radius: 50%;
-            background-color: #4CAF50;
-            animation: pulse 2s infinite;
+            margin-right: 8px;
+            animation: pulse 1.5s infinite;
         }
         
         @keyframes pulse {
@@ -79,882 +167,497 @@
             100% { opacity: 1; }
         }
         
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
+        .viewer-count {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #4a00e0;
+            font-weight: bold;
         }
         
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .card {
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .card-header {
+        .display-area {
+            flex-grow: 1;
             background-color: #f8f9fa;
+            border-radius: 15px;
             padding: 20px;
-            border-bottom: 1px solid #eaeaea;
-        }
-        
-        .card-header h2 {
-            color: #2c3e50;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            min-height: 350px;
+            border: 2px solid #eee;
         }
         
-        .card-body {
-            padding: 25px;
-        }
-        
-        .upload-section {
-            margin-bottom: 30px;
-        }
-        
-        .upload-area {
-            border: 2px dashed #667eea;
+        .display-content {
+            max-width: 100%;
+            max-height: 400px;
             border-radius: 10px;
-            padding: 40px 20px;
+            display: none;
+        }
+        
+        .display-content.show {
+            display: block;
+        }
+        
+        .placeholder-text {
+            color: #aaa;
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background-color: #f9f7ff;
+            font-size: 1.2rem;
         }
         
-        .upload-area:hover {
-            background-color: #f0ebff;
-            border-color: #764ba2;
-        }
-        
-        .upload-area i {
-            font-size: 3rem;
-            color: #667eea;
+        .placeholder-icon {
+            font-size: 4rem;
+            color: #ddd;
             margin-bottom: 15px;
         }
         
-        .upload-area p {
-            color: #666;
-            margin-bottom: 10px;
+        .file-list {
+            margin-top: 25px;
+            max-height: 200px;
+            overflow-y: auto;
         }
         
-        .upload-area span {
-            font-size: 0.9rem;
-            color: #888;
-        }
-        
-        #fileInput {
-            display: none;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #444;
-        }
-        
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border 0.3s;
-        }
-        
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .btn i {
-            margin-right: 8px;
-        }
-        
-        .btn-refresh {
-            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
-        }
-        
-        .btn-live {
-            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
-        }
-        
-        .gallery-container {
-            min-height: 500px;
-            position: relative;
-        }
-        
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        
-        .gallery-item {
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-            position: relative;
-        }
-        
-        .gallery-item:hover {
-            transform: scale(1.03);
-        }
-        
-        .gallery-item img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            display: block;
-        }
-        
-        .gallery-item-info {
-            padding: 15px;
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
             background-color: white;
-        }
-        
-        .gallery-item-info h4 {
-            margin-bottom: 5px;
-            color: #2c3e50;
-        }
-        
-        .gallery-item-info p {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-        }
-        
-        .gallery-item-info .meta {
-            color: #888;
-            font-size: 0.8rem;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .new-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #ff4757;
-            color: white;
-            font-size: 0.7rem;
-            padding: 3px 8px;
-            border-radius: 10px;
-            animation: pulse 2s infinite;
-        }
-        
-        .empty-gallery {
-            text-align: center;
-            padding: 60px 20px;
-            color: #888;
-        }
-        
-        .empty-gallery i {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            color: #ddd;
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .control-group {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 25px;
             border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            display: none;
-            z-index: 1000;
-            animation: slideIn 0.5s ease;
-            max-width: 350px;
+            margin-bottom: 10px;
+            border-left: 5px solid #4a00e0;
         }
         
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .file-icon {
+            font-size: 1.5rem;
+            color: #4a00e0;
+            margin-right: 15px;
+        }
+        
+        .recent-title {
+            font-size: 1.3rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #4a00e0;
         }
         
         footer {
             text-align: center;
             padding: 20px;
+            background-color: #f8f9fa;
             color: #666;
-            border-top: 1px solid #eaeaea;
-            margin-top: 40px;
+            border-top: 1px solid #eee;
         }
         
-        .loading {
-            display: flex;
-            justify-content: center;
-            padding: 30px;
-        }
-        
-        .spinner {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .preview-img {
-            max-width: 100%;
-            max-height: 200px;
-            margin: 15px 0;
-            border-radius: 8px;
-            display: none;
-        }
-        
-        .error-message {
-            color: #ff4757;
-            background-color: #ffeaea;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            display: none;
-        }
-        
-        .user-tag {
-            display: inline-block;
-            background-color: #e0e7ff;
-            color: #667eea;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            margin-left: 5px;
-        }
-        
-        .live-mode {
-            background-color: #fff9e6;
-            border-left: 4px solid #ffd700;
-            padding: 15px;
-            border-radius: 0 8px 8px 0;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .live-mode i {
-            color: #ff4757;
-            animation: pulse 1.5s infinite;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .upload-section {
+                border-right: none;
+                border-bottom: 2px dashed #ddd;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-camera-retro"></i>
-                    <h1>Live Photo Sharing</h1>
-                </div>
-                <div class="connection-status">
-                    <div class="status-dot"></div>
-                    <span id="connectionText">Terhubung</span>
-                </div>
-            </div>
-        </div>
-    </header>
-    
     <div class="container">
-        <div class="main-content">
-            <!-- Upload Section -->
-            <div class="card">
-                <div class="card-header">
-                    <h2><i class="fas fa-cloud-upload-alt"></i> Upload Foto</h2>
+        <header>
+            <h1><i class="fas fa-broadcast-tower"></i> Live File & Foto Sharing</h1>
+            <p class="subtitle">Unggah file atau foto Anda dan tampilkan secara real-time kepada viewer</p>
+        </header>
+        
+        <div class="content">
+            <!-- Bagian Upload -->
+            <div class="upload-section">
+                <h2 class="section-title"><i class="fas fa-cloud-upload-alt"></i> Unggah File/Foto</h2>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <i class="fas fa-file-upload"></i>
+                    </div>
+                    <div class="upload-text">
+                        <strong>Klik atau tarik file ke sini</strong>
+                    </div>
+                    <p>Maksimum ukuran file: 10MB</p>
+                    <p>Format yang didukung: JPG, PNG, GIF, PDF, TXT</p>
                 </div>
-                <div class="card-body">
-                    <div class="upload-section">
-                        <div class="upload-area" id="uploadArea">
-                            <i class="fas fa-images"></i>
-                            <p>Klik atau seret foto ke sini</p>
-                            <span>Format: JPG, PNG, GIF (Maks. 5MB)</span>
-                            <input type="file" id="fileInput" accept="image/*">
-                        </div>
-                        <img id="imagePreview" class="preview-img" alt="Preview">
-                        <div id="errorMessage" class="error-message"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="userName"><i class="fas fa-user"></i> Nama Anda</label>
-                        <input type="text" id="userName" placeholder="Masukkan nama Anda..." value="User">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="photoTitle"><i class="fas fa-heading"></i> Judul Foto</label>
-                        <input type="text" id="photoTitle" placeholder="Masukkan judul foto...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="photoDescription"><i class="fas fa-align-left"></i> Deskripsi</label>
-                        <textarea id="photoDescription" rows="3" placeholder="Masukkan deskripsi foto..."></textarea>
-                    </div>
-                    
-                    <button class="btn" id="uploadBtn">
-                        <i class="fas fa-upload"></i> Upload & Bagikan
-                    </button>
+                
+                <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.gif,.pdf,.txt" style="display: none;">
+                
+                <div class="file-info" id="fileInfo">
+                    <div class="file-name" id="fileName">Nama file</div>
+                    <div class="file-size" id="fileSize">Ukuran file</div>
+                </div>
+                
+                <button class="upload-btn" id="uploadBtn" disabled>
+                    <i class="fas fa-upload"></i> Unggah & Tampilkan ke Viewer
+                </button>
+                
+                <div class="recent-title">File Terbaru:</div>
+                <div class="file-list" id="fileList">
+                    <!-- Daftar file akan muncul di sini -->
                 </div>
             </div>
             
-            <!-- Gallery Section -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>
-                        <i class="fas fa-images"></i> Galeri Live 
-                        <span id="newPhotosBadge" class="new-badge" style="display: none;">BARU!</span>
-                    </h2>
+            <!-- Bagian Viewer -->
+            <div class="viewer-section">
+                <h2 class="section-title">
+                    <span class="live-indicator"></span>
+                    <i class="fas fa-eye"></i> Live Viewer
+                </h2>
+                
+                <div class="viewer-count">
+                    <i class="fas fa-users"></i> <span id="viewerCount">1</span> orang sedang melihat
                 </div>
-                <div class="card-body">
-                    <div class="live-mode">
-                        <i class="fas fa-broadcast-tower"></i>
-                        <span><strong>Mode Live Aktif</strong> - Foto baru akan muncul otomatis</span>
-                    </div>
-                    
-                    <div class="controls">
-                        <div class="control-group">
-                            <button class="btn btn-refresh" id="refreshBtn">
-                                <i class="fas fa-sync-alt"></i> Refresh
-                            </button>
-                            <button class="btn btn-live" id="toggleLiveBtn">
-                                <i class="fas fa-broadcast-tower"></i> Live: ON
-                            </button>
+                
+                <div class="display-area">
+                    <div id="placeholder">
+                        <div class="placeholder-icon">
+                            <i class="fas fa-image"></i>
                         </div>
-                        
-                        <div>
-                            <span id="photoCount">0 foto</span>
-                            <span id="lastUpdate"></span>
+                        <div class="placeholder-text">
+                            Belum ada file yang ditampilkan.<br>
+                            Unggah file untuk menampilkannya di sini.
                         </div>
                     </div>
                     
-                    <div class="gallery-container">
-                        <div id="gallery" class="gallery">
-                            <!-- Foto akan ditampilkan di sini -->
-                        </div>
-                        
-                        <div id="emptyGallery" class="empty-gallery">
-                            <i class="far fa-images"></i>
-                            <h3>Belum ada foto</h3>
-                            <p>Upload foto pertama untuk memulai!</p>
-                        </div>
-                        
-                        <div id="loading" class="loading" style="display: none;">
-                            <div class="spinner"></div>
-                        </div>
+                    <img id="imageDisplay" class="display-content" alt="Tampilan gambar">
+                    <iframe id="pdfDisplay" class="display-content" style="width: 100%; height: 400px;"></iframe>
+                    <pre id="textDisplay" class="display-content" style="white-space: pre-wrap; font-family: monospace; padding: 15px; background-color: white; border-radius: 5px; max-height: 400px; overflow-y: auto;"></pre>
+                </div>
+                
+                <div style="margin-top: 25px;">
+                    <h3 style="color: #4a00e0; margin-bottom: 10px;">Bagikan link ini:</h3>
+                    <div style="display: flex;">
+                        <input type="text" id="shareLink" value="https://livefileshare.example.com/view" readonly style="flex-grow: 1; padding: 12px; border: 2px solid #8e2de2; border-radius: 10px 0 0 10px; font-size: 1rem;">
+                        <button id="copyBtn" style="background: #4a00e0; color: white; border: none; padding: 0 20px; border-radius: 0 10px 10px 0; cursor: pointer; font-weight: bold;"><i class="fas fa-copy"></i> Salin</button>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <footer>
+            <p>© 2023 Live File & Foto Sharing | Dibuat dengan <i class="fas fa-heart" style="color: #ff4757;"></i> untuk berbagi konten secara real-time</p>
+        </footer>
     </div>
-    
-    <div id="notification" class="notification">
-        <i class="fas fa-check-circle"></i> <span id="notificationText">Foto berhasil diupload!</span>
-    </div>
-    
-    <footer>
-        <div class="container">
-            <p>&copy; 2023 Live Photo Sharing - Bagikan foto secara real-time dengan teman</p>
-            <p><i class="fas fa-info-circle"></i> Upload foto dari perangkat apapun, teman Anda bisa langsung melihatnya</p>
-        </div>
-    </footer>
 
     <script>
-        // Variabel global
-        let photos = [];
-        let selectedFile = null;
-        let isLiveMode = true;
-        let lastUpdateTime = null;
-        let autoRefreshInterval = null;
-        
         // Elemen DOM
-        const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
         const uploadBtn = document.getElementById('uploadBtn');
-        const refreshBtn = document.getElementById('refreshBtn');
-        const toggleLiveBtn = document.getElementById('toggleLiveBtn');
-        const gallery = document.getElementById('gallery');
-        const emptyGallery = document.getElementById('emptyGallery');
-        const loading = document.getElementById('loading');
-        const notification = document.getElementById('notification');
-        const notificationText = document.getElementById('notificationText');
-        const photoCount = document.getElementById('photoCount');
-        const newPhotosBadge = document.getElementById('newPhotosBadge');
-        const userNameInput = document.getElementById('userName');
-        const photoTitle = document.getElementById('photoTitle');
-        const photoDescription = document.getElementById('photoDescription');
-        const imagePreview = document.getElementById('imagePreview');
-        const errorMessage = document.getElementById('errorMessage');
-        const connectionText = document.getElementById('connectionText');
-        const lastUpdateElement = document.getElementById('lastUpdate');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const fileList = document.getElementById('fileList');
+        const viewerCount = document.getElementById('viewerCount');
+        const placeholder = document.getElementById('placeholder');
+        const imageDisplay = document.getElementById('imageDisplay');
+        const pdfDisplay = document.getElementById('pdfDisplay');
+        const textDisplay = document.getElementById('textDisplay');
+        const shareLink = document.getElementById('shareLink');
+        const copyBtn = document.getElementById('copyBtn');
         
-        // Inisialisasi
-        function init() {
-            loadPhotos();
-            setupEventListeners();
-            startAutoRefresh();
-            updateLastUpdateTime();
-            
-            // Generate nama user acak
-            const randomNames = ['Alex', 'Budi', 'Citra', 'Dian', 'Eko', 'Fina', 'Gita', 'Hadi', 'Indra', 'Joko'];
-            const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
-            userNameInput.value = randomName;
-        }
+        // State aplikasi
+        let currentFile = null;
+        let recentFiles = JSON.parse(localStorage.getItem('recentFiles')) || [];
+        let viewerCountNum = 1;
         
-        // Setup event listeners
-        function setupEventListeners() {
-            uploadArea.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', handleFileSelect);
-            uploadBtn.addEventListener('click', uploadPhoto);
-            refreshBtn.addEventListener('click', loadPhotos);
-            toggleLiveBtn.addEventListener('click', toggleLiveMode);
-            
-            // Drag and drop
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#764ba2';
-                uploadArea.style.backgroundColor = '#f0ebff';
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.style.borderColor = '#667eea';
-                uploadArea.style.backgroundColor = '#f9f7ff';
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#667eea';
-                uploadArea.style.backgroundColor = '#f9f7ff';
+        // Update daftar file terbaru
+        function updateFileList() {
+            fileList.innerHTML = '';
+            recentFiles.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
                 
-                if (e.dataTransfer.files.length) {
-                    fileInput.files = e.dataTransfer.files;
-                    handleFileSelect();
-                }
-            });
-        }
-        
-        // Handle pemilihan file
-        function handleFileSelect() {
-            errorMessage.style.display = 'none';
-            
-            if (!fileInput.files.length) {
-                return;
-            }
-            
-            const file = fileInput.files[0];
-            selectedFile = file;
-            
-            // Validasi ukuran file
-            if (file.size > 5 * 1024 * 1024) {
-                showError('Ukuran file terlalu besar! Maksimal 5MB');
-                return;
-            }
-            
-            // Validasi tipe file
-            const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            if (!validTypes.includes(file.type)) {
-                showError('Format file tidak didukung! Gunakan JPG, PNG, GIF, atau WebP');
-                return;
-            }
-            
-            // Tampilkan preview
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imagePreview.src = e.target.result;
-                imagePreview.style.display = 'block';
+                // Tentukan ikon berdasarkan tipe file
+                let fileIcon = 'fa-file';
+                if (file.type.includes('image')) fileIcon = 'fa-file-image';
+                else if (file.type.includes('pdf')) fileIcon = 'fa-file-pdf';
+                else if (file.type.includes('text')) fileIcon = 'fa-file-alt';
                 
-                uploadArea.innerHTML = `
-                    <i class="fas fa-check-circle" style="color:#00b09b"></i>
-                    <p>${file.name}</p>
-                    <span>File siap diupload (${formatBytes(file.size)})</span>
-                `;
-                
-                // Auto-generate judul jika kosong
-                if (!photoTitle.value) {
-                    const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
-                    photoTitle.value = fileNameWithoutExt;
-                }
-            };
-            
-            reader.readAsDataURL(file);
-        }
-        
-        // Upload foto
-        function uploadPhoto() {
-            if (!selectedFile) {
-                showError('Pilih foto terlebih dahulu');
-                return;
-            }
-            
-            const userName = userNameInput.value.trim() || 'Anonymous';
-            const title = photoTitle.value.trim() || 'Foto tanpa judul';
-            const description = photoDescription.value.trim() || 'Tidak ada deskripsi';
-            
-            // Tampilkan loading
-            loading.style.display = 'flex';
-            uploadBtn.disabled = true;
-            
-            // Simulasi proses upload
-            setTimeout(() => {
-                // Baca file sebagai URL data
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const newPhoto = {
-                        id: Date.now(),
-                        title: title,
-                        description: description,
-                        imageUrl: e.target.result,
-                        user: userName,
-                        timestamp: new Date().toLocaleString('id-ID'),
-                        isNew: true,
-                        device: getDeviceInfo()
-                    };
-                    
-                    // Simpan ke localStorage
-                    savePhotoToStorage(newPhoto);
-                    
-                    // Update tampilan
-                    photos.unshift(newPhoto);
-                    renderGallery();
-                    
-                    // Reset form
-                    resetUploadForm();
-                    
-                    // Sembunyikan loading
-                    loading.style.display = 'none';
-                    uploadBtn.disabled = false;
-                    
-                    // Tampilkan notifikasi
-                    showNotification(`"${title}" berhasil diupload!`);
-                    
-                    // Update waktu terakhir
-                    updateLastUpdateTime();
-                    
-                    // Simulasikan notifikasi ke pengguna lain
-                    simulateNewPhotoNotification();
-                };
-                
-                reader.readAsDataURL(selectedFile);
-            }, 1500);
-        }
-        
-        // Simpan foto ke storage
-        function savePhotoToStorage(photo) {
-            // Ambil data yang sudah ada
-            const storedPhotos = JSON.parse(localStorage.getItem('liveSharedPhotos') || '[]');
-            
-            // Tambahkan foto baru
-            storedPhotos.unshift(photo);
-            
-            // Simpan kembali (maksimal 50 foto)
-            if (storedPhotos.length > 50) {
-                storedPhotos.length = 50;
-            }
-            
-            localStorage.setItem('liveSharedPhotos', JSON.stringify(storedPhotos));
-        }
-        
-        // Muat foto dari storage
-        function loadPhotos() {
-            // Tampilkan loading
-            gallery.style.display = 'none';
-            emptyGallery.style.display = 'none';
-            loading.style.display = 'flex';
-            refreshBtn.disabled = true;
-            
-            // Simulasi loading dari server
-            setTimeout(() => {
-                // Ambil dari localStorage
-                const storedPhotos = JSON.parse(localStorage.getItem('liveSharedPhotos') || '[]');
-                photos = storedPhotos;
-                
-                // Tandai semua foto sudah dilihat
-                photos.forEach(photo => photo.isNew = false);
-                
-                // Update tampilan
-                renderGallery();
-                
-                // Sembunyikan loading
-                loading.style.display = 'none';
-                refreshBtn.disabled = false;
-                
-                // Update badge
-                updateNewPhotosBadge();
-                
-                // Update waktu terakhir
-                updateLastUpdateTime();
-                
-                // Update status koneksi
-                connectionText.textContent = `Terhubung • ${photos.length} foto`;
-            }, 800);
-        }
-        
-        // Render galeri
-        function renderGallery() {
-            gallery.innerHTML = '';
-            
-            if (photos.length === 0) {
-                emptyGallery.style.display = 'block';
-                gallery.style.display = 'none';
-                photoCount.textContent = '0 foto';
-                return;
-            }
-            
-            emptyGallery.style.display = 'none';
-            gallery.style.display = 'grid';
-            
-            // Batasi tampilan maksimal 20 foto
-            const displayPhotos = photos.slice(0, 20);
-            
-            displayPhotos.forEach(photo => {
-                const photoElement = document.createElement('div');
-                photoElement.className = 'gallery-item';
-                photoElement.innerHTML = `
-                    ${photo.isNew ? '<span class="new-badge">BARU!</span>' : ''}
-                    <img src="${photo.imageUrl}" alt="${photo.title}" onerror="this.src='https://via.placeholder.com/250x200?text=Error+Loading'">
-                    <div class="gallery-item-info">
-                        <h4>${photo.title}</h4>
-                        <p>${photo.description}</p>
-                        <div class="meta">
-                            <span><i class="fas fa-user"></i> ${photo.user}</span>
-                            <span><i class="far fa-clock"></i> ${photo.timestamp}</span>
-                        </div>
+                fileItem.innerHTML = `
+                    <div class="file-icon">
+                        <i class="fas ${fileIcon}"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: bold;">${file.name}</div>
+                        <div style="font-size: 0.8rem; color: #666;">${formatFileSize(file.size)} • ${formatDate(file.date)}</div>
                     </div>
                 `;
-                gallery.appendChild(photoElement);
+                
+                fileItem.addEventListener('click', () => {
+                    // Tampilkan file yang dipilih
+                    displayFile(file);
+                });
+                
+                fileList.appendChild(fileItem);
             });
-            
-            // Update jumlah foto
-            photoCount.textContent = `${photos.length} foto`;
-            
-            // Tampilkan badge jika ada foto baru
-            const hasNewPhotos = photos.some(photo => photo.isNew);
-            if (hasNewPhotos) {
-                newPhotosBadge.style.display = 'inline-block';
-            } else {
-                newPhotosBadge.style.display = 'none';
-            }
         }
         
-        // Reset form upload
-        function resetUploadForm() {
-            fileInput.value = '';
-            selectedFile = null;
-            photoTitle.value = '';
-            photoDescription.value = '';
-            imagePreview.style.display = 'none';
-            errorMessage.style.display = 'none';
-            
-            uploadArea.innerHTML = `
-                <i class="fas fa-images"></i>
-                <p>Klik atau seret foto ke sini</p>
-                <span>Format: JPG, PNG, GIF (Maks. 5MB)</span>
-            `;
-        }
-        
-        // Toggle mode live
-        function toggleLiveMode() {
-            isLiveMode = !isLiveMode;
-            
-            if (isLiveMode) {
-                toggleLiveBtn.innerHTML = '<i class="fas fa-broadcast-tower"></i> Live: ON';
-                toggleLiveBtn.classList.add('btn-live');
-                toggleLiveBtn.classList.remove('btn-refresh');
-                startAutoRefresh();
-                showNotification('Mode Live diaktifkan', 'info');
-            } else {
-                toggleLiveBtn.innerHTML = '<i class="fas fa-broadcast-tower"></i> Live: OFF';
-                toggleLiveBtn.classList.remove('btn-live');
-                toggleLiveBtn.classList.add('btn-refresh');
-                stopAutoRefresh();
-                showNotification('Mode Live dimatikan', 'info');
-            }
-        }
-        
-        // Start auto refresh
-        function startAutoRefresh() {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-            }
-            
-            if (isLiveMode) {
-                autoRefreshInterval = setInterval(() => {
-                    // Cek apakah ada foto baru
-                    const storedPhotos = JSON.parse(localStorage.getItem('liveSharedPhotos') || '[]');
-                    const currentCount = photos.length;
-                    
-                    if (storedPhotos.length > currentCount) {
-                        // Ada foto baru, reload
-                        loadPhotos();
-                        showNotification(`${storedPhotos.length - currentCount} foto baru tersedia!`, 'info');
-                    }
-                }, 5000); // Cek setiap 5 detik
-            }
-        }
-        
-        // Stop auto refresh
-        function stopAutoRefresh() {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-                autoRefreshInterval = null;
-            }
-        }
-        
-        // Update waktu terakhir
-        function updateLastUpdateTime() {
-            const now = new Date();
-            lastUpdateTime = now;
-            const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            lastUpdateElement.textContent = ` • Diperbarui: ${timeString}`;
-        }
-        
-        // Simulasi notifikasi foto baru untuk pengguna lain
-        function simulateNewPhotoNotification() {
-            // Ini hanya simulasi untuk demonstrasi
-            console.log('📢 Foto baru telah dibagikan! Pengguna lain akan melihatnya saat refresh.');
-        }
-        
-        // Dapatkan info perangkat
-        function getDeviceInfo() {
-            const userAgent = navigator.userAgent;
-            let device = 'Unknown';
-            
-            if (/Android/i.test(userAgent)) {
-                device = 'Android';
-            } else if (/iPhone|iPad|iPod/i.test(userAgent)) {
-                device = 'iOS';
-            } else if (/Windows/i.test(userAgent)) {
-                device = 'Windows';
-            } else if (/Mac/i.test(userAgent)) {
-                device = 'Mac';
-            } else if (/Linux/i.test(userAgent)) {
-                device = 'Linux';
-            }
-            
-            return device;
-        }
-        
-        // Format bytes
-        function formatBytes(bytes, decimals = 2) {
+        // Format ukuran file
+        function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
-            
             const k = 1024;
-            const dm = decimals < 0 ? 0 : decimals;
             const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            
             const i = Math.floor(Math.log(bytes) / Math.log(k));
-            
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
         
-        // Tampilkan error
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-            
-            uploadArea.innerHTML = `
-                <i class="fas fa-exclamation-triangle" style="color:#ff4757"></i>
-                <p>Gagal memuat file</p>
-                <span>${message}</span>
-            `;
+        // Format tanggal
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', { 
+                day: 'numeric', 
+                month: 'short', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
         
-        // Tampilkan notifikasi
-        function showNotification(message, type = 'success') {
-            notificationText.textContent = message;
+        // Tampilkan file di area viewer
+        function displayFile(file) {
+            // Sembunyikan placeholder
+            placeholder.style.display = 'none';
             
-            if (type === 'error') {
-                notification.style.backgroundColor = '#ff4757';
-            } else if (type === 'info') {
-                notification.style.backgroundColor = '#2ed573';
+            // Sembunyikan semua tampilan
+            imageDisplay.classList.remove('show');
+            pdfDisplay.classList.remove('show');
+            textDisplay.classList.remove('show');
+            
+            // Tampilkan berdasarkan tipe file
+            if (file.type.includes('image')) {
+                imageDisplay.src = file.dataUrl;
+                imageDisplay.classList.add('show');
+            } else if (file.type.includes('pdf')) {
+                pdfDisplay.src = file.dataUrl;
+                pdfDisplay.classList.add('show');
+            } else if (file.type.includes('text')) {
+                // Untuk file teks, baca kontennya
+                fetch(file.dataUrl)
+                    .then(response => response.text())
+                    .then(text => {
+                        textDisplay.textContent = text;
+                        textDisplay.classList.add('show');
+                    })
+                    .catch(error => {
+                        console.error('Error membaca file teks:', error);
+                        textDisplay.textContent = 'Tidak dapat menampilkan konten file.';
+                        textDisplay.classList.add('show');
+                    });
             } else {
-                notification.style.backgroundColor = '#4CAF50';
+                // Untuk tipe file lainnya
+                placeholder.innerHTML = `
+                    <div class="placeholder-icon">
+                        <i class="fas fa-file"></i>
+                    </div>
+                    <div class="placeholder-text">
+                        <strong>${file.name}</strong><br>
+                        File ini tidak dapat ditampilkan pratinjau.<br>
+                        Ukuran: ${formatFileSize(file.size)}
+                    </div>
+                `;
+                placeholder.style.display = 'block';
+            }
+        }
+        
+        // Update jumlah viewer (simulasi)
+        function updateViewerCount() {
+            // Ini adalah simulasi, di aplikasi nyata Anda akan menggunakan WebSocket
+            // untuk mendapatkan jumlah viewer yang sebenarnya
+            const change = Math.random() > 0.7 ? 1 : Math.random() > 0.9 ? -1 : 0;
+            viewerCountNum = Math.max(1, viewerCountNum + change);
+            viewerCount.textContent = viewerCountNum;
+            
+            // Update setiap 5-15 detik
+            setTimeout(updateViewerCount, 5000 + Math.random() * 10000);
+        }
+        
+        // Event Listeners
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = '#e0e5ff';
+            uploadArea.style.borderColor = '#4a00e0';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.backgroundColor = '#f0f2ff';
+            uploadArea.style.borderColor = '#8e2de2';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = '#f0f2ff';
+            uploadArea.style.borderColor = '#8e2de2';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelection();
+            }
+        });
+        
+        fileInput.addEventListener('change', handleFileSelection);
+        
+        function handleFileSelection() {
+            if (fileInput.files.length === 0) return;
+            
+            const file = fileInput.files[0];
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            
+            if (file.size > maxSize) {
+                alert('Ukuran file terlalu besar! Maksimum 10MB.');
+                return;
             }
             
-            notification.style.display = 'block';
+            // Tampilkan informasi file
+            fileInfo.classList.add('show');
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            
+            // Aktifkan tombol upload
+            uploadBtn.disabled = false;
+            
+            // Simpan file yang dipilih
+            currentFile = file;
+        }
+        
+        uploadBtn.addEventListener('click', () => {
+            if (!currentFile) return;
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const fileData = {
+                    name: currentFile.name,
+                    size: currentFile.size,
+                    type: currentFile.type,
+                    dataUrl: e.target.result,
+                    date: new Date().toISOString()
+                };
+                
+                // Simpan ke daftar file terbaru
+                recentFiles.unshift(fileData);
+                
+                // Simpan maksimal 5 file terbaru
+                if (recentFiles.length > 5) {
+                    recentFiles = recentFiles.slice(0, 5);
+                }
+                
+                // Simpan ke localStorage
+                localStorage.setItem('recentFiles', JSON.stringify(recentFiles));
+                
+                // Tampilkan file
+                displayFile(fileData);
+                
+                // Update daftar file
+                updateFileList();
+                
+                // Reset form
+                fileInfo.classList.remove('show');
+                uploadBtn.disabled = true;
+                currentFile = null;
+                fileInput.value = '';
+                
+                // Simulasi notifikasi ke viewer
+                simulateViewerNotification();
+            };
+            
+            if (currentFile.type.includes('text')) {
+                reader.readAsText(currentFile);
+            } else {
+                reader.readAsDataURL(currentFile);
+            }
+        });
+        
+        // Simulasi notifikasi ke viewer
+        function simulateViewerNotification() {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4a00e0;
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                animation: slideIn 0.5s ease;
+            `;
+            
+            notification.innerHTML = `
+                <strong><i class="fas fa-bell"></i> File baru!</strong>
+                <p style="margin-top: 5px; font-size: 0.9rem;">Pemilik mengunggah file baru</p>
+            `;
+            
+            document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.style.display = 'none';
-            }, 4000);
+                notification.style.animation = 'slideOut 0.5s ease';
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
         }
         
-        // Update badge foto baru
-        function updateNewPhotosBadge() {
-            const hasNewPhotos = photos.some(photo => photo.isNew);
-            newPhotosBadge.style.display = hasNewPhotos ? 'inline-block' : 'none';
-        }
+        // Salin link ke clipboard
+        copyBtn.addEventListener('click', () => {
+            shareLink.select();
+            shareLink.setSelectionRange(0, 99999); // Untuk perangkat mobile
+            
+            try {
+                navigator.clipboard.writeText(shareLink.value);
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
+                copyBtn.style.background = '#00b894';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.style.background = '#4a00e0';
+                }, 2000);
+            } catch (err) {
+                alert('Tidak dapat menyalin link. Silakan salin manual.');
+            }
+        });
+        
+        // Tambahkan animasi CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
         
         // Inisialisasi aplikasi
-        window.addEventListener('DOMContentLoaded', init);
+        function initApp() {
+            updateFileList();
+            updateViewerCount();
+            
+            // Jika ada file terbaru, tampilkan yang pertama
+            if (recentFiles.length > 0) {
+                displayFile(recentFiles[0]);
+            }
+            
+            // Set link berbagi (simulasi)
+            shareLink.value = window.location.href.replace(/#.*$/, '') + '?viewer=' + Math.random().toString(36).substring(7);
+        }
         
-        // Cek koneksi internet
-        window.addEventListener('online', () => {
-            connectionText.textContent = 'Terhubung';
-            showNotification('Koneksi internet pulih', 'info');
-        });
-        
-        window.addEventListener('offline', () => {
-            connectionText.textContent = 'Offline';
-            showNotification('Anda sedang offline', 'error');
-        });
+        // Jalankan aplikasi saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
